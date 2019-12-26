@@ -18,7 +18,7 @@
         <li v-for="(item, index) in goods" :key="index" class="food-list food-list-hook">
           <h1 class="title">{{item.name}}</h1>
           <ul>
-            <li v-for="(food, index) in item.foods" :key="index" class="border-1px food-item">
+            <li v-for="(food, index) in item.foods" :key="index" class="border-1px food-item" @click="selectFood(food, $event)">
               <div class="icon">
                 <img width="57px" :src="food.icon" alt="">
               </div>
@@ -45,6 +45,8 @@
     </div>
     <!-- 底部shopCart -->
     <shopcart ref="shopcart" :select-foods="selectFoods" :deliveryPrice="seller.deliveryPrice" :minPrice="seller.minPrice"></shopcart>
+    <!-- 商品详情 -->
+    <food :food="selectedFood" ref="food"></food>
   </div>
 </template>
 
@@ -52,18 +54,23 @@
   import BScroll from 'better-scroll'
   import shopcart from '../../components/shopcart/shopcart.vue'
   import cartControl from '../../components/cartControl/cartControl.vue'
+  import food from '../food/food.vue'
+
   const ERR_OK = 0
+
   export default {
     name: 'goods',
     components: {
       shopcart,
-      cartControl
+      cartControl,
+      food
     },
     data() {
       return {
         goods: [],
         listHeight: [],
-        scrollY: 0
+        scrollY: 0,
+        selectedFood: {}
       }
     },
     props: {
@@ -144,6 +151,13 @@
         let foodList = this.$refs.foodWrapper.getElementsByClassName('food-list-hook')
         let el = foodList[index] // 获取氧元素
         this.foodScroll.scrollToElement(el, 300) // 滚动到某个元素
+      },
+      selectFood(food, event) {
+        if (!event._constructed) {
+          return
+        }
+        this.selectedFood = food
+        this.$refs.food.show() // 调用子组件方法
       },
       /* 监听+号按钮点击事件 */
       _drop(target) {
